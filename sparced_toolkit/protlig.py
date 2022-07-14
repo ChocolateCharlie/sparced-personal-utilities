@@ -18,5 +18,16 @@ def bound_fraction(kd, pt, lt):
     a = pt
     b = (kd + lt + pt)
     c = lt
-    return((b-sqrt(b*b-4*a*c))/(2*a))
+    return((b - sqrt(b*b - 4*a*c)) / (2*a))
 
+def koff(kd, kon):
+    """Compute the koff
+
+    Args:
+        kd: the constant of dissociation as a numerical
+        kon: the kon as a numerical
+
+    Returns:
+        A float.
+    """
+    return(kd * kon)
