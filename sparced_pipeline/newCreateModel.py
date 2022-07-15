@@ -40,6 +40,12 @@ def antimony_init(f_cv, f_s):
     spec = np.array([np.array(line.strip().split("\t")) for line in open(f_s)], dtype="object")
     return((comp, vol, spec))
 
+def antimony_write_init_compartments(f, comp, vol):
+    f.write("# Compartments initialization:\n")
+    for i in range(len(comp)):
+        f.write("{name} = {volume}.6e;\n{name} has volume;\n".format(name=comp[i], volume=np.double(vol[i])))
+    f.write("\n")  
+
 def antimony_write_compartments(f, comp):
     f.write("# Compartments and Species:\n")
     for i in range(len(comp)):
@@ -156,12 +162,16 @@ if __name__ == '__main__':
         antimony_model.write("model {antimony}()\n\n".format(antimony=args.antimony))
         # Initialize compartment and volume lists
         compartments, volumes, species = antimony_init(f_comp, f_spec)
-        # Write antimony compartments
+        # Write antimony compartments, species and reactions
         antimony_write_compartments(antimony_model, compartments)
-        # Write antimony species
         antimony_write_species(antimony_model, species)
-        # Write antimony reactions
         antimony_write_reactions(antimony_model, f_rate, f_stoi, f_outp)
+        # Write antimony initial conditions (compartments)
+        antimony_write_init_compartments(antimony_model, compartments, volumes)
+
+
+
+
         
 
 
