@@ -40,17 +40,30 @@ def antimony_init(f_cv, f_s):
     spec = np.array([np.array(line.strip().split("\t")) for line in open(f_s)], dtype="object")
     return((comp, vol, spec))
 
-def antimony_write_init_compartments(f, comp, vol):
-    f.write("# Compartments initialization:\n")
-    for i in range(len(comp)):
-        f.write("{name} = {volume}.6e;\n{name} has volume;\n".format(name=comp[i], volume=np.double(vol[i])))
-    f.write("\n")  
 
 def antimony_write_compartments(f, comp):
     f.write("# Compartments and Species:\n")
     for i in range(len(comp)):
         f.write("Compartment {comp_name}; ".format(comp_name=comp[i]))
     f.write("\n\n")
+
+def antimony_write_init_compartments(f, comp, vol):
+    f.write("# Compartments initialization:\n")
+    for i in range(len(comp)):
+        f.write("{name} = {volume}.6e;\n{name} has volume;\n".format(name=comp[i], volume=np.double(vol[i])))
+    f.write("\n")
+
+def antimony_write_init_reactions(f, p_names, p_vals):
+    f.write("# Reactions' parameters initializations:\n ")
+    for i, val in enumerate(p_names):
+        f.write("{name} = {value}.6e;\n".format(name=val, value=np.double(p_vals[i])))
+    f.write("\n")
+
+def antimony_write_init_species(f, spec):
+    f.write("# Species initialization:\n")
+    for i, val in enumerate(species[1:]): # Skip header
+        f.write("{name} = {concentration}.6e;\n".format(name=val[0], concentration=np.double(val[2])))
+    f.write("\n")
 
 def antimony_write_reactions(f, f_rl, f_sm, f_outp):
     f.write("# Reactions:\n")
@@ -137,6 +150,7 @@ def antimony_write_reactions(f, f_rl, f_sm, f_outp):
     params_all.to_csv(f_outp,sep='\t',header=True, index=True)
     # ========== END OF COPY/PASTE ==========
     f.write("\n")
+    return((paramnames, paramvals))
 
 def antimony_write_species(f, spec):
     for i, val in enumerate(spec[1:]): # Skip header row
@@ -156,7 +170,7 @@ if __name__ == '__main__':
     current_dir = os.getcwd()
     copy_directory(current_dir + args.inputdir, current_dir)
 
-    # ANTIMONY
+    # Antimony
     with open(antimony_model_name + ".txt", "w") as antimony_model:
         antimony_model.write("# PanCancer Model by Birtwistle Lab\n")
         antimony_model.write("model {antimony}()\n\n".format(antimony=args.antimony))
@@ -165,14 +179,12 @@ if __name__ == '__main__':
         # Write antimony compartments, species and reactions
         antimony_write_compartments(antimony_model, compartments)
         antimony_write_species(antimony_model, species)
-        antimony_write_reactions(antimony_model, f_rate, f_stoi, f_outp)
-        # Write antimony initial conditions (compartments)
+        param_names, param_vals = antimony_write_reactions(antimony_model, f_rate, f_stoi, f_outp)
+        # Write antimony initial conditions (compartments, volumes, species, reactions' parameters)
         antimony_write_init_compartments(antimony_model, compartments, volumes)
+        antimony_write_init_species(antimony_model, species)
+        antimony_write_init_reactions(antimony_model, param_names, param_vals)
 
-
-
-
-        
 
 
 
