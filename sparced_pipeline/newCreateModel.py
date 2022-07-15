@@ -8,6 +8,8 @@ import argparse
 import numpy as np
 from bin.copydir import copy_directory
 
+# ---------------------------------------------------------------------------------------------------------------------------------------------------
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--antimony',     default="SPARCED",          help="name of the antimony model's name")
@@ -22,21 +24,32 @@ def parse_args():
 def set_io_filenames(args):
     return(args.compartments, args.stoichmatrix, args.outputparams, args.ratelaws, args.species)
 
-def antimony_init(f):
+# ---------------------------------------------------------------------------------------------------------------------------------------------------
+
+def antimony_init(f_cv, f_s):
+    # Compartments and Volumes
     comp = []
     vol = []
-    sheet = np.array([np.array(line.strip().split("\t")) for line in open(f)])
+    sheet = np.array([np.array(line.strip().split("\t")) for line in open(f_cv)])
     for row in sheet[1:]: # Skip header row
         comp.append(row[0])
         vol.append(row[1])
-    return((comp, vol))
+    # Species
+    spec = np.array([np.array(line.strip().split("\t")) for line in open(f_s)], dtype="object")
+    return((comp, vol, spec))
 
 def antimony_write_compartments(f, comp):
     f.write("# Compartments and Species:\n")
     for i in range(len(comp)):
         f.write("Compartment {comp_name}; ".format(comp_name=comp[i]))
     f.write("\n\n")
+
+def antimony_write_species(f, spec):
+    for i, val in enumerate(spec[1:]): # Skip header row
+        f.write("Species {name} in {compartment}\n".format(name=val[0], compartment=val[1]))
+    f.write("\n")
     
+# ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     args = parse_args()
@@ -54,6 +67,14 @@ if __name__ == '__main__':
         antimony_model.write("# PanCancer Model by Birtwistle Lab\n")
         antimony_model.write("model {antimony}()\n\n".format(antimony=args.antimony))
         # Initialize compartment and volume lists
-        compartments, volumes = antimony_init(f_comp)
+        compartments, volumes, species = antimony_init(f_comp, f_spec)
         # Write antimony compartments
         antimony_write_compartments(antimony_model, compartments)
+        # Write antimony species
+        antimony_write_species(antimony_model, species)
+
+
+
+
+
+
