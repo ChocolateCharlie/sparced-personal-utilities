@@ -5,12 +5,14 @@
 import os
 import sys
 
+import amici
 from antimony import *
 import argparse
 import libsbml
 
 from bin.antimony_utils import *
 from bin.copydir import copy_directory
+from bin.sbml_utils import *
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -38,6 +40,7 @@ if __name__ == '__main__':
     # Initialize filenames
     f_comp, f_stoi, f_outp, f_rate, f_spec = set_io_filenames(args)
     antimony_model_name = args.antimony
+    antimony_file_name = antimony_model_name + ".txt"
     sbml_model_name = model_output_dir = args.sbml
     sbml_file_name = sbml_model_name + ".xml"
 
@@ -46,7 +49,7 @@ if __name__ == '__main__':
     copy_directory(current_dir + args.inputdir, current_dir)
 
     # Antimony
-    with open(antimony_model_name + ".txt", "w") as antimony_model:
+    with open(antimony_file_name, "w") as antimony_model:
         # Write antimony file's header
         antimony_model.write("# PanCancer Model by Birtwistle Lab\n")
         antimony_model.write("model {antimony}()\n\n".format(antimony=antimony_model_name))
@@ -66,7 +69,7 @@ if __name__ == '__main__':
 
     # Load Antimony model
     try:
-        assert not loadFile(antimony_model_name + ".txt") == -1
+        assert not loadFile(antimony_file_name) == -1
     except:
         print("SPARCED: Failed to load Antimony file")
         sys.exit(0)
@@ -82,4 +85,27 @@ if __name__ == '__main__':
     else:
         if args.verbose: print("SPARCED: Success converting Antimony file to SBML")
 
+    # SBML: Annotation
+    # Import SBML file
+    sbml_reader = libsbml.SBMLReader()
+    sbml_doc = sbml_reader.readSBML(sbml_file_name)
+    sbml_model = sbml_doc.getModel()
+    # Set species annotations
+    write_species_annotations(sbml_model, species)
+    # Set compartments annotations
+    # write_compartments_annotations(sbml_model, compartments)
+    # Export the annotated SBML file
+    writer = libsbml.SBMLWriter()
+    writer.writeSBML(sbml_doc, sbml_file_name)
 
+    # SBML: Compilation
+    # Import annotated SBML file
+    sys.path.insert(0, os.path.abspath(model_output_dir))
+    sbml_reader = libsbml.SBMLReader()
+    sbml_doc = sbml_reader.readSBML(sbml_file_name)
+    sbml_model = sbml_doc.getModel()
+    sbml_importer = amici.SbmlImporter(sbml_file_name)
+    const_params = [params.getId() for params in sbml_model.getListOfParameters()]
+    # Compile
+    sbml_importer.sbml2amici(sbml_model_name, model_output_dir, verbose=args.verbose)
+    if args.verbose: print("SPARCED: Success compiling the model")
