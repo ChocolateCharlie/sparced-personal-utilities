@@ -40,6 +40,19 @@ def antimony_init(f_cv, f_s):
     spec = np.array([np.array(line.strip().split("\t")) for line in open(f_s)], dtype="object")
     return((comp, vol, spec))
 
+def antimony_terminal(f):
+    # Constant variables
+    f.write("# Other declarations:\nconst ")
+    constants = ['Cytoplasm', 'Extracellular', 'Nucleus', 'Mitochondrion']
+    for c in constants[:-1]:
+        f.write("{name} ".format(name=c))
+    f.write("{last_name}\n\n".format(last_name=constants[-1]))
+    # Unit definitions
+    f.write("# Unit definitions:\n")
+    f.write("  unit time_unit = second;\n")
+    f.write("  unit volume = litre;\n")
+    f.write("  unit substance = 1e-9 mole;\n")
+    f.write("  unit nM = 1e-9 mole / litre;\n\n")
 
 def antimony_write_compartments(f, comp):
     f.write("# Compartments and Species:\n")
@@ -172,6 +185,7 @@ if __name__ == '__main__':
 
     # Antimony
     with open(antimony_model_name + ".txt", "w") as antimony_model:
+        # Write antimony file's header
         antimony_model.write("# PanCancer Model by Birtwistle Lab\n")
         antimony_model.write("model {antimony}()\n\n".format(antimony=args.antimony))
         # Initialize compartment and volume lists
@@ -184,8 +198,8 @@ if __name__ == '__main__':
         antimony_write_init_compartments(antimony_model, compartments, volumes)
         antimony_write_init_species(antimony_model, species)
         antimony_write_init_reactions(antimony_model, param_names, param_vals)
-
-
-
+        # Write other declarations and unit definitions
+        antimony_terminal(antimony_model)
+        antimony_model.write("\nend") # End of antimony file
 
 
