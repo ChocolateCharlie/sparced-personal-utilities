@@ -3,8 +3,12 @@
 """Sparced Pipeline: Model Creation"""
 
 import os
+import sys
+
 from antimony import *
 import argparse
+import libsbml
+
 from bin.antimony_utils import *
 from bin.copydir import copy_directory
 
@@ -12,13 +16,15 @@ from bin.copydir import copy_directory
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-a', '--antimony',     default="SPARCED",          help="name of the antimony model's name")
+    parser.add_argument('-a', '--antimony',     default="SPARCED",          help="name of the antimony model")
+    parser.add_argument('-b', '--sbml',         default="SPARCED",          help="name of the SBML model")
     parser.add_argument('-c', '--compartments', default="Compartments.txt", help="name of the compartments' file")
     parser.add_argument('-i', '--inputdir',     default="/input_files",     help="relative path to input files directory")
     parser.add_argument('-m', '--stoichmatrix', default="StoicMat.txt",     help="name of the stoichiometric matrix' file")
     parser.add_argument('-o', '--outputparams', default="ParamsAll.txt",    help="name of the output parameters' file")
     parser.add_argument('-r', '--ratelaws',     default="Ratelaws.txt",     help="name of the rate laws' file")
     parser.add_argument('-s', '--species',      default="Species.txt",      help="name of the species' file")
+    parser.add_argument('-v', '--verbose',      default=True,               help="display additional details during execution")
     return(parser.parse_args())
 
 def set_io_filenames(args):
@@ -32,6 +38,8 @@ if __name__ == '__main__':
     # Initialize filenames
     f_comp, f_stoi, f_outp, f_rate, f_spec = set_io_filenames(args)
     antimony_model_name = args.antimony
+    sbml_model_name = model_output_dir = args.sbml
+    sbml_file_name = sbml_model_name + ".xml"
 
     # Copy intput files in working directory
     current_dir = os.getcwd()
@@ -41,7 +49,7 @@ if __name__ == '__main__':
     with open(antimony_model_name + ".txt", "w") as antimony_model:
         # Write antimony file's header
         antimony_model.write("# PanCancer Model by Birtwistle Lab\n")
-        antimony_model.write("model {antimony}()\n\n".format(antimony=args.antimony))
+        antimony_model.write("model {antimony}()\n\n".format(antimony=antimony_model_name))
         # Initialize compartment and volume lists
         compartments, volumes, species = antimony_init(f_comp, f_spec)
         # Write antimony compartments, species and reactions
@@ -55,5 +63,23 @@ if __name__ == '__main__':
         # Write other declarations and unit definitions
         antimony_terminal(antimony_model)
         antimony_model.write("\nend") # End of antimony file
+
+    # Load Antimony model
+    try:
+        assert not loadFile(antimony_model_name + ".txt") == -1
+    except:
+        print("SPARCED: Failed to load Antimony file")
+        sys.exit(0)
+    else:
+        if args.verbose: print("SPARCED: Success loading Antimony file")
+
+    # Convert Antimony model into SBML
+    try:
+        assert not writeSBMLFile(sbml_file_name, antimony_model_name) == 0
+    except:
+        print("SPARCED: Failed to convert Antimony file to SBML")
+        sys.exit(0)
+    else:
+        if args.verbose: print("SPARCED: Success converting Antimony file to SBML")
 
 
