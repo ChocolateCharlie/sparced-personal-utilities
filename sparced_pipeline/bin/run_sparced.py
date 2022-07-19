@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from bin.SGEmodule import SGEmodule
-from bin.RunPrep import RunPrep
+from bin.run_prep import run_prep
 
 def run_sparced(flagD, th, spdata, genedata, sbml_file, model):
     ts = 30 # time-step to update mRNA numbers
