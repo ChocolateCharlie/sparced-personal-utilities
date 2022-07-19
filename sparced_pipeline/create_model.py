@@ -26,7 +26,7 @@ def parse_args():
     parser.add_argument('-o', '--outputparams', default="ParamsAll.txt",    help="name of the output parameters' file")
     parser.add_argument('-r', '--ratelaws',     default="Ratelaws.txt",     help="name of the rate laws' file")
     parser.add_argument('-s', '--species',      default="Species.txt",      help="name of the species' file")
-    parser.add_argument('-v', '--verbose',      default=True,               help="display additional details during execution")
+    parser.add_argument('-v', '--verbose',       action='store_true',       help="display additional details during execution")
     return(parser.parse_args())
 
 def set_io_filenames(args):
