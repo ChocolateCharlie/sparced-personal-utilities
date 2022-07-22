@@ -64,8 +64,15 @@ if __name__ == '__main__':
     while cell_number < args.pop:
         # INITIALIZATION
         # Set initial conditions
-        species_initializations = np.array(pd.read_csv(os.path.abspath(args.species), sep="\t", header=None, index_col=0, squeeze=True))
-        species_initializations[np.argwhere(species_initializations <= 1e-6)] = 0.0
+        species_sheet = np.array([np.array(line.strip().split("\t")) for line in open('Species.txt', encoding='latin-1')])
+        species_initializations = []
+        for row in species_sheet[1:]:
+            species_initializations = np.append(species_initializations, float(row[2]))
+            species_initializations = np.array(species_initializations)
+            species_initializations[np.argwhere(species_initializations <= 1e-6)] = 0.0
+        # species_initializations = pd.read_csv(os.path.abspath(args.species), sep="\t", header=None, index_col=0, squeeze=True)
+        # species_initializations = np.array(species_initializations)
+        # species_initializations[np.argwhere(species_initializations <= 1e-6)] = 0.0
         # Input ligand concentrations (in order): EGF, Her, HGF, PDGF, FGF, IGF, INS
         STIMligs = [float(args.egf), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # in nM, in extracellular volume
         species_initializations[155:162] = STIMligs
