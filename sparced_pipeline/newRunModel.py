@@ -57,7 +57,7 @@ if __name__ == '__main__':
     if args.verbose: print(model_module)
     # Set model
     model = model_module.getModel()
-    model.setTimepoints(np.linspace(0, 3600*args.time, int(3600*args.time+1)))
+    model.setTimepoints(np.linspace(0, args.time, 2))
 
     # Run simulations
     cell_number = 0
