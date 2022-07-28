@@ -82,5 +82,6 @@ if __name__ == '__main__':
         xoutS_all, xoutG_all, tout_all = run_sparced(args.deterministic, args.time, species_initializations,[], sbml_model_name + ".xml", model)
         # SAVE OUTPUT
         save_output(model, args.name, cell_number, xoutS_all, xoutG_all)
-        # tout_all_control/3600.0
+        if args.verbose: print("SPARCED: Simulation is now over")
+        print(tout_all/3600.0)
         cell_number += 1
