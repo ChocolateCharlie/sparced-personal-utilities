@@ -23,7 +23,8 @@ def parse_args():
     parser.add_argument('-d', '--dose',          default=0.0,           help="compound's concentration in nM")
     parser.add_argument('-D', '--deterministic', action='store_const',  help="flag D", const=1, default=0)
     parser.add_argument('-e', '--egf',           default=1.0,           help="EGF concentration in nM")
-    parser.add_argument('-n', '--name',          default="GrowthStim", help="name of the simulation")
+    parser.add_argument('-i', '--ins',           default=17.21,         help="EGF concentration in nM")
+    parser.add_argument('-n', '--name',          default="GrowthStim",  help="name of the simulation")
     parser.add_argument('-p', '--pop',           default=1,             help="number of cells in the population")
     parser.add_argument('-s', '--species',       default="Species.txt", help="name of the species' file")
     parser.add_argument('-t', '--time',          default=1.0,           help="duration of the simulation in virtual time")
@@ -63,6 +64,9 @@ if __name__ == '__main__':
     # Set model
     model = model_module.getModel()
     model.setTimepoints(np.linspace(0, args.exchange, 2))
+    # Save list of compounds
+    species_all = list(model.getStateIds())
+    species_all.to_csv('species_list.txt', sep="\t")
 
     # Run simulations
     cell_number = 0
@@ -76,10 +80,9 @@ if __name__ == '__main__':
             species_initializations = np.array(species_initializations)
             species_initializations[np.argwhere(species_initializations <= 1e-6)] = 0.0
         # Input ligand concentrations (in order): EGF, Her, HGF, PDGF, FGF, IGF, INS
-        STIMligs = [float(args.egf), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] # in nM, in extracellular volume
+        STIMligs = [float(args.egf), 0.0, 0.0, 0.0, 0.0, 0.0, float(args.ins)] # in nM, in extracellular volume
         species_initializations[155:162] = STIMligs
         # Compound
-        species_all = list(model.getStateIds())
         if args.compound is not None: species_initializations[species_all.index(args.compound)] = args.dose
         model.setInitialStates(species_initializations)
         # SIMULATION
