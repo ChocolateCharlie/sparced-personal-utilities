@@ -66,11 +66,11 @@ if __name__ == '__main__':
     model.setTimepoints(np.linspace(0, args.exchange, 2))
     # Save list of compounds
     species_all = list(model.getStateIds())
-    species_all.to_csv('species_list.txt', sep="\t")
+    np.savetxt('species_list.txt', species_all, delimiter="\t", fmt="%s")
 
     # Run simulations
     cell_number = 0
-    while cell_number < args.pop:
+    while cell_number < int(args.pop):
         # INITIALIZATION
         # Set initial conditions
         species_sheet = np.array([np.array(line.strip().split("\t")) for line in open('Species.txt', encoding='latin-1')])
@@ -87,9 +87,8 @@ if __name__ == '__main__':
         model.setInitialStates(species_initializations)
         # SIMULATION
         if args.verbose: print("SPARCED: Now ready to run a simulation")
-        xoutS_all, xoutG_all, tout_all = run_sparced(args.deterministic, args.time, species_initializations,[], sbml_model_name + ".xml", model)
+        xoutS_all, xoutG_all, tout_all = run_sparced(args.deterministic, float(args.time), species_initializations,[], sbml_model_name + ".xml", model)
         # SAVE OUTPUT
         save_output(model, args.name, cell_number, xoutS_all, xoutG_all, tout_all)
         if args.verbose: print("SPARCED: Simulation is now over")
-        print(tout_all/3600.0)
         cell_number += 1
