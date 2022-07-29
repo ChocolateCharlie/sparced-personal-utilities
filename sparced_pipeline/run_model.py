@@ -23,7 +23,7 @@ def parse_args():
     parser.add_argument('-d', '--dose',          default=0.0,           help="compound's concentration in nM")
     parser.add_argument('-D', '--deterministic', action='store_const',  help="flag D", const=1, default=0)
     parser.add_argument('-e', '--egf',           default=1.0,           help="EGF concentration in nM")
-    parser.add_argument('-n', '--name',          default="GrowthStim_", help="name of the simulation")
+    parser.add_argument('-n', '--name',          default="GrowthStim", help="name of the simulation")
     parser.add_argument('-p', '--pop',           default=1,             help="number of cells in the population")
     parser.add_argument('-s', '--species',       default="Species.txt", help="name of the species' file")
     parser.add_argument('-t', '--time',          default=1.0,           help="duration of the simulation in virtual time")
@@ -31,19 +31,24 @@ def parse_args():
     parser.add_argument('-x', '--exchange',      default=30,            help="information exchange between modules timeframe")
     return(parser.parse_args())
 
-def save_output(model, file_prefix, cell_number, xoutS_all, xoutG_all):
+def save_output(model, file_prefix, cell_number, xoutS_all, xoutG_all, tout_all):
+    # xoutS
     columnsS = [ele for ele in model.getStateIds()]
+    condsSDF = pd.DataFrame(data=xoutS_all, columns=columnsS)
+    condsSDF.to_csv(file_prefix+'_S_'+str(cell_number)+'.txt',sep="\t")  
+    condsSDF = None
+    #xoutG
     columnsG = [x for n, x in enumerate(columnsS) if 'm_' in x]
     columnsG = columnsG[1:] # Skip header
     resa = [sub.replace('m_', 'ag_') for sub in columnsG]
     resi = [sub.replace('m_', 'ig_') for sub in columnsG]
     columnsG2 = np.concatenate((resa, resi), axis=None)
-    condsSDF = pd.DataFrame(data=xoutS_all, columns=columnsS)
-    condsSDF.to_csv(file_prefix+'S_'+str(cell_number)+'.txt',sep="\t")  
-    condsSDF = None
     condsGDF = pd.DataFrame(data=xoutG_all,columns=columnsG2)
-    condsGDF.to_csv(file_prefix+'G_'+str(cell_number)+'.txt',sep="\t") 
+    condsGDF.to_csv(file_prefix+'_G_'+str(cell_number)+'.txt',sep="\t") 
     condsGDF = None
+    #tout
+    condsTT = pd.DataFrame(data=tout_all)
+    condsTT.to_csv(file_prefix+'_T_'+str(cell_number)+'.txt',sep="\t")
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -57,7 +62,7 @@ if __name__ == '__main__':
     if args.verbose: print(model_module)
     # Set model
     model = model_module.getModel()
-    model.setTimepoints(np.linspace(0, args.time, 2))
+    model.setTimepoints(np.linspace(0, args.exchange, 2))
 
     # Run simulations
     cell_number = 0
@@ -81,7 +86,7 @@ if __name__ == '__main__':
         if args.verbose: print("SPARCED: Now ready to run a simulation")
         xoutS_all, xoutG_all, tout_all = run_sparced(args.deterministic, args.time, species_initializations,[], sbml_model_name + ".xml", model)
         # SAVE OUTPUT
-        save_output(model, args.name, cell_number, xoutS_all, xoutG_all)
+        save_output(model, args.name, cell_number, xoutS_all, xoutG_all, tout_all)
         if args.verbose: print("SPARCED: Simulation is now over")
         print(tout_all/3600.0)
         cell_number += 1
