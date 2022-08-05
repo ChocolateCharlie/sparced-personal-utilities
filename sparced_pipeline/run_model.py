@@ -49,7 +49,7 @@ def save_output(model, file_prefix, cell_number, xoutS_all, xoutG_all, tout_all)
     condsGDF.to_csv(file_prefix+'_G_'+str(cell_number)+'.txt',sep="\t") 
     condsGDF = None
     #tout
-    np.savetxt(file_prefix+'T'+str(cell_number)+'.txt', tout_all, newline="\t", fmt="%s")
+    np.savetxt(file_prefix+'_T_'+str(cell_number)+'.txt', tout_all, newline="\t", fmt="%s")
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 
