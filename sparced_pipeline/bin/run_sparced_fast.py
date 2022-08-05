@@ -72,4 +72,4 @@ def run_sparced_fast(flagD, th, spdata, sbml_file, model, omics_input='OmicsData
     xoutG_all = xoutG_all[~np.all(xoutG_all == 0, axis=1)]
     tout_all = tout_all[0:len(xoutS_all)]
     
-    return xoutS_all, xoutG_all, tout_all, flagA
+    return xoutS_all, xoutG_all, tout_all

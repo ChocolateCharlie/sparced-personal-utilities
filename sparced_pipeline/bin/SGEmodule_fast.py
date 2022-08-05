@@ -7,7 +7,7 @@ import scipy.stats
 from random import *
 import pandas as pd
 
-def SGEmodule(flagD,ts,genedata,spdata,Vn,Vc,kTCmaxs,kTCleak,kTCd,AllGenesVec,GenePositionMatrix,kGin_1,kGac_1, 
+def SGEmodule_fast(flagD,ts,genedata,spdata,Vn,Vc,kTCmaxs,kTCleak,kTCd,AllGenesVec,GenePositionMatrix,kGin_1,kGac_1, 
               tcnas,tck50as,tcnrs,tck50rs,spIDs,mRNAInds0):
     # Inputs:
     # flagD = deterministic (1) or stochastic (0) simulation
