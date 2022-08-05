@@ -18,18 +18,19 @@ from bin.run_sparced import run_sparced
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-b', '--sbml',          default="SPARCED",     help="name of the SBML model")
-    parser.add_argument('-c', '--compound',      default=None,          help="compound's name")
-    parser.add_argument('-d', '--dose',          default=0.0,           help="compound's concentration in nM")
-    parser.add_argument('-D', '--deterministic', action='store_const',  help="flag D", const=1, default=0)
-    parser.add_argument('-e', '--egf',           default=1.0,           help="EGF concentration in nM")
-    parser.add_argument('-i', '--ins',           default=17.21,         help="EGF concentration in nM")
-    parser.add_argument('-n', '--name',          default="GrowthStim",  help="name of the simulation")
-    parser.add_argument('-p', '--pop',           default=1,             help="number of cells in the population")
-    parser.add_argument('-s', '--species',       default="Species.txt", help="name of the species' file")
-    parser.add_argument('-t', '--time',          default=1.0,           help="duration of the simulation in virtual time")
-    parser.add_argument('-v', '--verbose',       action='store_true',   help="display additional details during execution")
-    parser.add_argument('-x', '--exchange',      default=30,            help="information exchange between modules timeframe")
+    parser.add_argument('-b', '--sbml',          default="SPARCED",          help="name of the SBML model")
+    parser.add_argument('-c', '--compound',      default=None,               help="compound's name")
+    parser.add_argument('-d', '--dose',          default=0.0,                help="compound's concentration in nM")
+    parser.add_argument('-D', '--deterministic', action='store_const',       help="flag D", const=1, default=0)
+    parser.add_argument('-e', '--egf',           default=1.0,                help="EGF concentration in nM")
+    parser.add_argument('-i', '--ins',           default=17.21,              help="EGF concentration in nM")
+    parser.add_argument('-l', '--list',          default="species_list.txt", help="name of the list of species file")
+    parser.add_argument('-n', '--name',          default="GrowthStim",       help="name of the simulation")
+    parser.add_argument('-p', '--pop',           default=1,                  help="number of cells in the population")
+    parser.add_argument('-s', '--species',       default="Species.txt",      help="name of the species' file")
+    parser.add_argument('-t', '--time',          default=1.0,                help="duration of the simulation in virtual time")
+    parser.add_argument('-v', '--verbose',       action='store_true',        help="display additional details during execution")
+    parser.add_argument('-x', '--exchange',      default=30,                 help="information exchange between modules timeframe")
     return(parser.parse_args())
 
 def save_output(model, file_prefix, cell_number, xoutS_all, xoutG_all, tout_all):
@@ -48,8 +49,7 @@ def save_output(model, file_prefix, cell_number, xoutS_all, xoutG_all, tout_all)
     condsGDF.to_csv(file_prefix+'_G_'+str(cell_number)+'.txt',sep="\t") 
     condsGDF = None
     #tout
-    condsTT = pd.DataFrame(data=tout_all)
-    condsTT.to_csv(file_prefix+'_T_'+str(cell_number)+'.txt',sep="\t")
+    np.savetxt(file_prefix+'T'+str(cell_number)+'.txt', tout_all, newline="\t", fmt="%s")
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -64,16 +64,16 @@ if __name__ == '__main__':
     # Set model
     model = model_module.getModel()
     model.setTimepoints(np.linspace(0, args.exchange, 2))
-    # Save list of compounds
+    # Save list of species
     species_all = list(model.getStateIds())
-    np.savetxt('species_list.txt', species_all, delimiter="\t", fmt="%s")
+    np.savetxt(args.list, species_all, newline="\t", fmt="%s")
 
     # Run simulations
     cell_number = 0
     while cell_number < int(args.pop):
         # INITIALIZATION
         # Set initial conditions
-        species_sheet = np.array([np.array(line.strip().split("\t")) for line in open('Species.txt', encoding='latin-1')])
+        species_sheet = np.array([np.array(line.strip().split("\t")) for line in open(args.species, encoding='latin-1')])
         species_initializations = []
         for row in species_sheet[1:]:
             species_initializations = np.append(species_initializations, float(row[2]))
@@ -82,7 +82,7 @@ if __name__ == '__main__':
         # Input ligand concentrations (in order): EGF, Her, HGF, PDGF, FGF, IGF, INS
         STIMligs = [float(args.egf), 0.0, 0.0, 0.0, 0.0, 0.0, float(args.ins)] # in nM, in extracellular volume
         species_initializations[155:162] = STIMligs
-        # Compound
+        # Add compound if specified
         if args.compound is not None: species_initializations[species_all.index(args.compound)] = args.dose
         model.setInitialStates(species_initializations)
         # SIMULATION

@@ -3,8 +3,10 @@
 """Sparced Pipeline: Post-Simulation Plot Sparced Data"""
 
 import argparse
+import csv
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -17,29 +19,37 @@ def parse_args():
     parser.add_argument('-v', '--verbose',    action='store_true',        help="display additional details during execution")
     return(parser.parse_args())
 
+def read_species(f):
+    with open(f, 'r') as f:
+        s = f.read()
+        species = s.split("\t")
+    return(species)
+
 def set_filenames(args):
-    return(args.control, args.experiment, args.time, args.species)
+    return(args.control, args.experiment, args.species, args.time)
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     args = parse_args()
 
-    # Open two files and store the content
-    f_control, f_exp, f_time, f_spec = set_filenames(args)
-    control = np.array([np.array(line.strip().split("\t"), skiprows=1) for line in open(f_control)], dtype="object")
-    experiment = np.array([np.array(line.strip().split("\t"), skiprows=1) for line in open(f_exp)], dtype="object")
-    species = np.array(line.strip().split("\t") for line in open(f_spec))
+    # Load data
+    f_cont, f_exp, f_spec, f_time = set_filenames(args)
+    control = pd.read_csv(f_cont, header=0, sep="\t")
+    del control[control.columns[0]] # Drop first column (index)
+    experiment = pd.read_csv(f_exp, header=0, sep="\t")
+    del experiment[experiment.columns[0]] # Drop first column (index)
+    species = read_species(f_spec)
     time = np.array(line.strip().split("\t") for line in open(f_time))
-    
+    tt = time / 3600.0
+
     # Plot
     if args.verbose: print("SPARCED: Ready to plot")
     plot_loop = True
     while plot_loop:
         compound = input("Enter compound (see species list) : ")
-        if compound != "END":
+        if compound != "STOP":
             fig = plt.figure(figsize=(8, 2), dpi=300, facecolor='w', edgecolor='k')
-            tt = time / 3600.0
             plt.plot(tt, control[:,species.index(compound)], 'b', linewidth=2, markersize=1, label='control')
             plt.plot(tt, experiment[:,species.index(compound)], 'r', linewidth=2, markersize=1, label='experiment')
             plt.xlim([-0.5, tt[-1]+1])
@@ -53,7 +63,3 @@ if __name__ == '__main__':
         else:
             plot_loop = False
     if args.verbose: print("SPARCED: End of plot loop")
-    
-    
-    
-    
