@@ -88,7 +88,7 @@ if __name__ == '__main__':
         model.setInitialStates(species_initializations)
         # SIMULATION
         if args.verbose: print("SPARCED: Now ready to run a simulation")
-        xoutS_all, xoutG_all, tout_all = run_sparced_fast(args.deterministic, float(args.time), species_initializations,[], sbml_model_name + ".xml", model)
+        xoutS_all, xoutG_all, tout_all = run_sparced_fast(args.deterministic, float(args.time), species_initializations, sbml_model_name + ".xml")
         # SAVE OUTPUT
         save_output(model, args.name, cell_number, xoutS_all, xoutG_all, tout_all)
         if args.verbose: print("SPARCED: Simulation is now over")
