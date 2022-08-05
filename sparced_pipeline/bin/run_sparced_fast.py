@@ -12,7 +12,7 @@ import pandas as pd
 from bin.SGEmodule import SGEmodule
 from bin.run_prep import run_prep
 
-def run_sparced_fast(flagD, th, spdata, sbml_file, omics_input='OmicsData.txt',genereg_input='GeneReg.txt'):
+def run_sparced_fast(flagD, th, spdata, sbml_file, model, omics_input='OmicsData.txt',genereg_input='GeneReg.txt'):
     wd = str(os.getcwd())
 
     ts = 30 # time-step to update mRNA numbers
@@ -22,16 +22,16 @@ def run_sparced_fast(flagD, th, spdata, sbml_file, omics_input='OmicsData.txt',g
     # Read-in the model SBML to get compartmental volumes (used to convert nM to mpc and vice versa)
     sbml_reader = libsbml.SBMLReader()
     sbml_doc = sbml_reader.readSBML(sbml_file)
-    model = sbml_doc.getModel()
-    Vc = model.getCompartment(0).getVolume() # Should be the index for Cytoplasm
-    Vn = model.getCompartment(2).getVolume() # Should be the index for Nuclues
+    sbml_model = sbml_doc.getModel()
+    Vc = sbml_model.getCompartment(0).getVolume() # Should be the index for Cytoplasm
+    Vn = sbml_model.getCompartment(2).getVolume() # Should be the index for Nuclues
     mpc2nM_Vc = (1E9/(Vc*6.023E+23))
     splist = list(model.getStateIds())
     
     PARPind = [ind for ind,ele in enumerate(splist) if ele in {'PARP'}] # find the index for PARP
     cPARPind = [ind for ind,ele in enumerate(splist) if ele in {'cPARP'}]
     
-    genedata, mExp_mpc, GenePositionMatrix, AllGenesVec, kTCmaxs, kTCleak, kTCleak2, kGin_1, kGac_1, kTCd, TARs0, tcnas, tcnrs, tck50as, tck50rs, spIDs, mrna_idx = run_prep(flagD,Vn,model,wd,omics_input,genereg_input)
+    genedata, mExp_mpc, GenePositionMatrix, AllGenesVec, kTCmaxs, kTCleak, kTCleak2, kGin_1, kGac_1, kTCd, TARs0, tcnas, tcnrs, tck50as, tck50rs, spIDs, mrna_idx = run_prep(flagD,Vn,model)
     
     if len(spdata)==0:
         spdata0 = pd.read_csv(os.path.join(wd,'input_files','Species.txt'),header=0,index_col=0,sep="\t")
