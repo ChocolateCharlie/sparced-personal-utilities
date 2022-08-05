@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 from bin.SGEmodule import SGEmodule
-from bin.run_prep import run_prep
+from bin.run_prep_fast import run_prep_fast
 
 def run_sparced_fast(flagD, th, spdata, sbml_file, model, omics_input='OmicsData.txt',genereg_input='GeneReg.txt'):
     wd = str(os.getcwd())
@@ -31,7 +31,7 @@ def run_sparced_fast(flagD, th, spdata, sbml_file, model, omics_input='OmicsData
     PARPind = [ind for ind,ele in enumerate(splist) if ele in {'PARP'}] # find the index for PARP
     cPARPind = [ind for ind,ele in enumerate(splist) if ele in {'cPARP'}]
     
-    genedata, mExp_mpc, GenePositionMatrix, AllGenesVec, kTCmaxs, kTCleak, kTCleak2, kGin_1, kGac_1, kTCd, TARs0, tcnas, tcnrs, tck50as, tck50rs, spIDs, mrna_idx = run_prep(flagD,Vn,model)
+    genedata, mExp_mpc, GenePositionMatrix, AllGenesVec, kTCmaxs, kTCleak, kTCleak2, kGin_1, kGac_1, kTCd, TARs0, tcnas, tcnrs, tck50as, tck50rs, spIDs, mrna_idx = run_prep_fast(flagD,Vn,model,wd,omics_input,genereg_input)
     
     if len(spdata)==0:
         spdata0 = pd.read_csv(os.path.join(wd,'input_files','Species.txt'),header=0,index_col=0,sep="\t")
