@@ -9,7 +9,7 @@ import amici
 import numpy as np
 import pandas as pd
 
-from bin.SGEmodule import SGEmodule
+from bin.SGEmodule_fast import SGEmodule_fast
 from bin.run_prep_fast import run_prep_fast
 
 def run_sparced_fast(flagD, th, spdata, sbml_file, model, omics_input='OmicsData.txt',genereg_input='GeneReg.txt'):
@@ -54,7 +54,7 @@ def run_sparced_fast(flagD, th, spdata, sbml_file, model, omics_input='OmicsData
     n_sp = len(splist)
     
     for qq in range(NSteps):
-        genedata,xmN,AllGenesVec = SGEmodule(flagD,ts,xoutG_all[qq,:],xoutS_all[qq,:],Vn,Vc,kTCmaxs,kTCleak,kTCd,AllGenesVec,GenePositionMatrix,kGin_1,kGac_1,tcnas,tck50as,tcnrs,tck50rs,spIDs,mrna_idx)
+        genedata,xmN,AllGenesVec = SGEmodule_fast(flagD,ts,xoutG_all[qq,:],xoutS_all[qq,:],Vn,Vc,kTCmaxs,kTCleak,kTCd,AllGenesVec,GenePositionMatrix,kGin_1,kGac_1,tcnas,tck50as,tcnrs,tck50rs,spIDs,mrna_idx)
         xoutS_all[qq,mrna_idx] = np.dot(xmN,mpc2nM_Vc)
         model.setInitialStates(xoutS_all[qq,:])
         rdata = amici.runAmiciSimulation(model, solver)  # Run simulation

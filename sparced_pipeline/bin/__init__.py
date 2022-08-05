@@ -8,4 +8,5 @@ from bin.run_prep_fast import run_prep_fast
 # from bin.run_sparced import run_sparced
 from bin.run_sparced_fast import run_sparced_fast
 from bin.sbml_utils import *
-from bin.SGEmodule import SGEmodule
+# from bin.SGEmodule import SGEmodule
+from bin.SGEmodule_fast import SGEmodule_fast
