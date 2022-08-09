@@ -38,12 +38,11 @@ parser.add_argument('-p', '--pop',     default=3,               help="number of 
 parser.add_argument('--perturb',metavar='perturb',help='Specify perturbed species', default = 'lapatinib')
 parser.add_argument('-s', '--species', default="Species.txt",   help="name of the species' file")
 parser.add_argument('-t', '--time',    default=72.0,            help="duration of the experiment in virtual hours")
-# parser.add_argument('--td',metavar='td', help='cell line doubling time (hrs) ', default = 48)
 args = parser.parse_args()
 
 # Paths
 wd = str(os.getcwd()).replace("jupyter_notebooks","")
-sim_name = str(args.sim_name)
+sim_name = str(args.name)
 output_path = os.path.join(wd,'output',sim_name)
 
 if MY_RANK==0:
@@ -79,10 +78,13 @@ cell_pop = int(args.pop)
 STIMligs = [0.0,0,0,0,0,0,0.0]
 perturb = str(args.perturb)
 # dose = float(args.dose)*10e2
-sp_input = pd.read_csv(os.path.join(wd,'initializer', args.species),sep='\t',header=None,index_col=0,squeeze=True)
 
-species_initializations = np.array(sp_input)
-species_initializations[np.argwhere(species_initializations <= 1e-6)] = 0.0
+species_sheet = np.array([np.array(line.strip().split("\t")) for line in open(args.species, encoding='latin-1')])
+species_initializations = []
+for row in species_sheet[1:]:
+    species_initializations = np.append(species_initializations, float(row[2]))
+    species_initializations = np.array(species_initializations)
+    species_initializations[np.argwhere(species_initializations <= 1e-6)] = 0.0
 species_initializations[155:162] = STIMligs
 
 dose_egf = float(args.egf)
