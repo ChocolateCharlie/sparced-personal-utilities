@@ -1,4 +1,4 @@
-# SPARCED (non official) installation guide on Ubuntu
+# The SPARCED (Non Official) Installation Guide on Ubuntu
 ---
 Hi! 🌄
 
@@ -74,11 +74,13 @@ ssh-keygen -t ed25519 -C "{email}" # with {email} being your email for GitHub
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 ```
+:coin: **Tip:** Just press ```[enter]``` to use the default file in which to save the key.
+
 Print your SSH key in the terminal using:
 ```bash
-cat ~/.ssh/id_ed25519
+cat ~/.ssh/id_ed25519.pub
 ```
-Then copy it and in your GitHub settings, create a new SSH key and paste it.
+Copy it. The in your GitHub settings, create a new SSH key and paste it.
 
 Run the following command to test your SSH connexion:
 ```bash
@@ -86,28 +88,41 @@ ssh -T git@github.com
 ```
 
 ## Anaconda
-Download the [Anaconda installer for Linux](https://www.anaconda.com/products/distribution#linux), then run the following commands:
+Download the [Anaconda installer for Linux](https://www.anaconda.com/products/distribution#linux), then run the following commands in your terminal:
 ```bash
 sudo apt-get install libgl1-mesa-glx libegl1-mesa libxrandr2 libxrandr2 libxss1 libxcursor1 libxcomposite1 libasound2 libxi6 libxtst6
 bash ~/Downloads/Anaconda3-{version-number}-Linux-x86_64.sh # with {version-number} being your version number
-source ~/.bashrc # or alternatively close and reopen your terminal
+```
+Then follow the instructions of the installer. Make sure it initializes Anaconda3 by running conda init (type "yes" when asked for).
+
+Once the installation is over, you need to restart your terminal (close and reopen it or type ```source ~/.bashrc```).
+
+Conda will automatically activate your ```base``` environment when launching the terminal. If you want to disable this behavior, enter:
+```bash
 conda config --set auto_activate_base False # set it according to your preferences
 ```
-Verify your installation using:
+Finally, verify your installation using:
 ```bash
 conda list
 ```
+To make sure Anaconda is up to date, run:
+```bash
+conda update anaconda
+```
 
-## Packages
+### Environment
+Create a new Anaconda environment using the following commands:
 ```bash
 conda create -n sparced # Creates an environment named "sparced"
 source activate sparced # Activates the "sparced" environment
-conda install -c anaconda spyder
-conda install matplotlib
-conda install pandas
-pip install -Iv antimony==2.12.0.1 # WARNING: antimony >= 2.13.0 doesn't work with SPARCED
+```
+Unless you decide to set it otherwise, you will have to manually activate the "sparced" environment each time you reopen your terminal.
+
+### Python Packages
+```bash
+conda install matplotlib pandas scipy
 pip install python-libsbml
-pip install scipy
+pip install -Iv antimony==2.12.0.1 # WARNING: antimony >= 2.13.0 doesn't work with SPARCED
 ```
 ### The Amici Package
 ```bash
@@ -119,8 +134,15 @@ You might get an error about the CBLAS library (this happens mostly on Palmetto)
 conda install -c conda-forge openblas
 export BLAS_LIBS=-lopenblas
 ```
-### TODO: mpi4py
+
+### The mpi4py Package
 _If you are not going to use parallel computation, skip this section._
+```bash
+conda remove compilers # if the compilers package is missing then don't install it!
+conda install -c forge mpi4py
+conda install -c conda-forge compilers
+python -m pip install gmx_MMPBSA
+```
 
 ## TODO: Docker
 _If you are not going to run SPARCED inside the official Jupyter Notebook container, skip this section._
@@ -128,7 +150,7 @@ _If you are not going to run SPARCED inside the official Jupyter Notebook contai
 ## SPARCED 🎆
 This is only a setup suggestion:
 ```bash
-cd Documents
+cd ~/Documents
 mkdir birtwistle-lab ; cd birtwistle-lab
 git clone --recursive https://github.com/birtwistlelab/SPARCED.git # The official SPARCED repository
 cd ..
