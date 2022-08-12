@@ -46,7 +46,7 @@ cd openmpi
 cp ~/Downloads/openmpi-{version number}.tar.gz . # with {version number} being the version number
 tar -xzvf openmpi-{version number}.tar.gz # with {version number} being the version number
 cd openmpi-{version number} # with {version number} being the version number
-./configure --prefix=$HOME/openmpi
+./configure --prefix=$HOME/openmpi --enable-mpi-cxx
 make install
 export PATH=$HOME/openmpi/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/openmpi/lib:$LD_LIBRARY_PATH
