@@ -89,10 +89,10 @@ if __name__ == '__main__':
             species_initializations[np.argwhere(species_initializations <= 1e-6)] = 0.0
         # INCUBATION
         # Add compound
-        if args.compound is no None: species_initializations[species_all.index(args.compound)] = args.dose
+        if args.compound is not None: species_initializations[species_all.index(args.compound)] = args.dose
         model.setInitialStates(species_initializations)
         if args.verbose: print("SPARCED: Now ready to start incubation")
-        xoutS_incub, xoutG_incub, tout_incub = run_sparced_fact(args.deterministic, float(args.incubation), species_initializations, sbml_model_name + ".xml", model)
+        xoutS_incub, xoutG_incub, tout_incub = run_sparced_fast(args.deterministic, float(args.incubation), species_initializations, sbml_model_name + ".xml", model)
         save_output(model, args.name + "_incub", cell_number, xoutS_incub, xoutG_incub, tout_incub)
         if args.verbose: print("SPARCED: Incubation is now over")
         # SIMULATION
