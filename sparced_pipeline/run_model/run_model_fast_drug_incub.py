@@ -31,7 +31,7 @@ def parse_args():
     parser.add_argument('-D', '--deterministic', action='store_const',       help="flag D", const=1, default=0)
     parser.add_argument('-e', '--egf',           default=1.0,                help="EGF concentration in nM")
     parser.add_argument('-i', '--ins',           default=17.21,              help="EGF concentration in nM")
-		parser.add_argument('-k', '--incubation',    default=24.0,               help="duration of the incubation")
+    parser.add_argument('-k', '--incubation',    default=24.0,               help="duration of the incubation")
     parser.add_argument('-l', '--list',          default="species_list.txt", help="name of the list of species file")
     parser.add_argument('-n', '--name',          default="GrowthStim",       help="name of the simulation")
     parser.add_argument('-p', '--pop',           default=1,                  help="number of cells in the population")
@@ -45,7 +45,7 @@ def save_output(model, file_prefix, cell_number, xoutS_all, xoutG_all, tout_all)
     # xoutS
     columnsS = [ele for ele in model.getStateIds()]
     condsSDF = pd.DataFrame(data=xoutS_all, columns=columnsS)
-    condsSDF.to_csv(file_prefix+'_S_'+str(cell_number)+'.txt',sep="\t")  
+    condsSDF.to_csv(file_prefix+'_S_'+str(cell_number)+'.txt',sep="\t")
     condsSDF = None
     #xoutG
     columnsG = [x for n, x in enumerate(columnsS) if 'm_' in x]
@@ -54,7 +54,7 @@ def save_output(model, file_prefix, cell_number, xoutS_all, xoutG_all, tout_all)
     resi = [sub.replace('m_', 'ig_') for sub in columnsG]
     columnsG2 = np.concatenate((resa, resi), axis=None)
     condsGDF = pd.DataFrame(data=xoutG_all,columns=columnsG2)
-    condsGDF.to_csv(file_prefix+'_G_'+str(cell_number)+'.txt',sep="\t") 
+    condsGDF.to_csv(file_prefix+'_G_'+str(cell_number)+'.txt',sep="\t")
     condsGDF = None
     #tout
     np.savetxt(file_prefix+'_T_'+str(cell_number)+'.txt', tout_all, newline="\t", fmt="%s")
@@ -87,20 +87,20 @@ if __name__ == '__main__':
             species_initializations = np.append(species_initializations, float(row[2]))
             species_initializations = np.array(species_initializations)
             species_initializations[np.argwhere(species_initializations <= 1e-6)] = 0.0
-				# INCUBATION
-				# Add compound
-				if args.compound is no None: species_initializations[species_all.index(args.compound)] = args.dose
-				model.setInitialStates(species_initializations)
-				if args.verbose: print("SPARCED: Now ready to start incubation")
-				xoutS_incub, xoutG_incub, tout_incub = run_sparced_fact(args.deterministic, float(args.incubation), species_initializations, sbml_model_name + ".xml", model)
-				save_output(model, args.name + "_incub", cell_number, xoutS_incub, xoutG_incub, tout_incub)
-				if args.verbose: print("SPARCED: Incubation is now over")
-				# SIMULATION
-				for idx in range(len(species_initializations)):
-					species_initializations[idx] = xoutS_incub[-1:,idx]
-				model.setInitialStates(species_initializations)
-			  # Input ligand concentrations (in order): EGF, Her, HGF, PDGF, FGF, IGF, INS
-				STIMligs = [float(args.egf), 0.0, 0.0, 0.0, 0.0, 0.0, float(args.ins)] # in nM, in extracellular volume
+        # INCUBATION
+        # Add compound
+        if args.compound is no None: species_initializations[species_all.index(args.compound)] = args.dose
+        model.setInitialStates(species_initializations)
+        if args.verbose: print("SPARCED: Now ready to start incubation")
+        xoutS_incub, xoutG_incub, tout_incub = run_sparced_fact(args.deterministic, float(args.incubation), species_initializations, sbml_model_name + ".xml", model)
+        save_output(model, args.name + "_incub", cell_number, xoutS_incub, xoutG_incub, tout_incub)
+        if args.verbose: print("SPARCED: Incubation is now over")
+        # SIMULATION
+        for idx in range(len(species_initializations)):
+            species_initializations[idx] = xoutS_incub[-1:,idx]
+        model.setInitialStates(species_initializations)
+        # Input ligand concentrations (in order): EGF, Her, HGF, PDGF, FGF, IGF, INS
+        STIMligs = [float(args.egf), 0.0, 0.0, 0.0, 0.0, 0.0, float(args.ins)] # in nM, in extracellular volume
         species_initializations[155:162] = STIMligs
         if args.verbose: print("SPARCED: Now ready to run a simulation")
         xoutS_all, xoutG_all, tout_all = run_sparced_fast(args.deterministic, float(args.time), species_initializations, sbml_model_name + ".xml", model)
