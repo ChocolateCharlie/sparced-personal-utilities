@@ -88,17 +88,17 @@ if __name__ == '__main__':
             species_initializations = np.array(species_initializations)
             species_initializations[np.argwhere(species_initializations <= 1e-6)] = 0.0
         # INCUBATION
-				# Clear all growth factor
-				STIMligs = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-				species_initializations[155:162] = STIMligs
+        # Clear all growth factor
+        STIMligs = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        species_initializations[155:162] = STIMligs
         # Add compound
         if args.compound is not None: species_initializations[species_all.index(args.compound)] = args.dose
         model.setInitialStates(species_initializations)
         if args.verbose: print("SPARCED: Now ready to start incubation")
-				# Run incubation
+        # Run incubation
         xoutS_incub, xoutG_incub, tout_incub = run_sparced_fast(args.deterministic, float(args.incubation), species_initializations, sbml_model_name + ".xml", model)
         # Save output
-				save_output(model, args.name + "_incub", cell_number, xoutS_incub, xoutG_incub, tout_incub)
+        save_output(model, args.name + "_incub", cell_number, xoutS_incub, xoutG_incub, tout_incub)
         if args.verbose: print("SPARCED: Incubation is now over")
         # SIMULATION
         for idx in range(len(species_initializations)):
@@ -106,7 +106,7 @@ if __name__ == '__main__':
         # Input ligand concentrations (in order): EGF, Her, HGF, PDGF, FGF, IGF, INS
         STIMligs = [float(args.egf), 0.0, 0.0, 0.0, 0.0, 0.0, float(args.ins)] # in nM, in extracellular volume
         species_initializations[155:162] = STIMligsi
-				model.setInitialStates(species_initializations)
+        model.setInitialStates(species_initializations)
         if args.verbose: print("SPARCED: Now ready to run a simulation")
         xoutS_all, xoutG_all, tout_all = run_sparced_fast(args.deterministic, float(args.time), species_initializations, sbml_model_name + ".xml", model)
         # SAVE OUTPUT
