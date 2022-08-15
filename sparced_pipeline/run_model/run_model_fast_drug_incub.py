@@ -105,7 +105,7 @@ if __name__ == '__main__':
             species_initializations[idx] = xoutS_incub[-1:,idx]
         # Input ligand concentrations (in order): EGF, Her, HGF, PDGF, FGF, IGF, INS
         STIMligs = [float(args.egf), 0.0, 0.0, 0.0, 0.0, 0.0, float(args.ins)] # in nM, in extracellular volume
-        species_initializations[155:162] = STIMligsi
+        species_initializations[155:162] = STIMligs
         model.setInitialStates(species_initializations)
         if args.verbose: print("SPARCED: Now ready to run a simulation")
         xoutS_all, xoutG_all, tout_all = run_sparced_fast(args.deterministic, float(args.time), species_initializations, sbml_model_name + ".xml", model)
