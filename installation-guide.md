@@ -46,7 +46,7 @@ cd openmpi
 cp ~/Downloads/openmpi-{version number}.tar.gz . # with {version number} being the version number
 tar -xzvf openmpi-{version number}.tar.gz # with {version number} being the version number
 cd openmpi-{version number} # with {version number} being the version number
-./configure --prefix=$HOME/openmpi --enable-mpi-cxx
+./configure --prefix=$HOME/openmpi # do not add any flag related to C++ (cxx) as they are no longer supported
 make install
 export PATH=$HOME/openmpi/bin:$PATH
 export LD_LIBRARY_PATH=$HOME/openmpi/lib:$LD_LIBRARY_PATH
@@ -107,7 +107,7 @@ conda list
 ```
 To make sure Anaconda is up to date, run:
 ```bash
-conda update anaconda
+conda update -all
 ```
 
 ### Environment
@@ -139,7 +139,7 @@ export BLAS_LIBS=-lopenblas
 _If you are not going to use parallel computation, skip this section._
 ```bash
 conda remove compilers # if the compilers package is missing then don't install it!
-conda install -c forge mpi4py
+conda install -c forge mpi4py # if you encounter any dependency version failure, try downgrading to Python 3.11 by typing 'conda install python=3.11'
 conda install -c conda-forge compilers
 python -m pip install gmx_MMPBSA
 ```
