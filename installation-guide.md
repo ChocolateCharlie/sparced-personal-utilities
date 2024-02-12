@@ -152,10 +152,10 @@ This is only a setup suggestion:
 ```bash
 cd ~/Documents
 mkdir birtwistle-lab ; cd birtwistle-lab
-git clone --recursive https://github.com/birtwistlelab/SPARCED.git # The official SPARCED repository
+git clone --recursive ssh://git@github.com/birtwistlelab/SPARCED.git # The official SPARCED repository
 cd ..
-git clone --recursive https://github.com/{username}/SPARCED.git # with {username} being your username on GitHub, assuming that you already forked SPARCED
-git clone --recursive https://github.com/ChocolateCharlie/sparced-personal-utilities.git # My code, feel free to improve it :)
+git clone --recursive ssh://git@github.com/{username}/SPARCED.git # with {username} being your username on GitHub, assuming that you already forked SPARCED
+git clone --recursive ssh://git@github.com/ChocolateCharlie/sparced-personal-utilities.git # My code, feel free to improve it :)
 ```
 
 ## Clean
