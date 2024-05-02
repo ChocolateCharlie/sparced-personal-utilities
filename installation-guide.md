@@ -1,5 +1,11 @@
-# The SPARCED (Non Official) Installation Guide on Ubuntu
+# The SPARCED (~~Non~~ Official) Installation Guide on Ubuntu
 ---
+
+> :warning: This guide became official!
+> 
+> Please check the SPARCED repository for updates, as this version wil no longer be maintained.
+
+
 Hi! 🌄
 
 If you are new to SPARCED and wish to get a working environment setup on Ubuntu, then you are at the right place!
